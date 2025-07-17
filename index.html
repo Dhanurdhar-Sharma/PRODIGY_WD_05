@@ -1,35 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Weather App</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-br from-blue-400 to-indigo-600 min-h-screen flex items-center justify-center">
+<body class="bg-gradient-to-r from-blue-200 to-blue-500 min-h-screen flex flex-col items-center justify-start pt-20">
 
-  <div class="bg-white rounded-2xl shadow-lg p-6 w-full max-w-md text-center">
-    <h1 class="text-2xl font-bold mb-4 text-gray-700">Weather App</h1>
-    
-    <input id="cityInput" type="text" placeholder="Enter city"
-      class="border p-2 w-full rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-
-    <button onclick="getWeather()" 
-      class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition w-full">
-      Get Weather
-    </button>
-
-    <div id="weatherInfo" class="mt-6 hidden">
-      <h2 id="cityName" class="text-xl font-semibold text-gray-800 mb-2"></h2>
-      <p id="temp" class="text-3xl font-bold text-blue-700"></p>
-      <p id="description" class="capitalize text-gray-600 mb-2"></p>
-      <p id="humidity" class="text-sm text-gray-600"></p>
-      <p id="wind" class="text-sm text-gray-600"></p>
+  <!-- Navigation -->
+  <nav id="navbar" class="fixed top-0 w-full bg-white shadow-lg transition duration-300 z-50">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between">
+        <div class="text-2xl font-bold py-4 text-blue-700">WeatherApp</div>
+        <ul class="flex space-x-6 py-4">
+          <li class="hover:text-blue-500 cursor-pointer">Home</li>
+          <li class="hover:text-blue-500 cursor-pointer">About</li>
+          <li class="hover:text-blue-500 cursor-pointer">Contact</li>
+        </ul>
+      </div>
     </div>
+  </nav>
 
-    <p id="error" class="text-red-600 mt-4 hidden"></p>
+  <!-- Main Content -->
+  <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6 mt-4 text-center">
+    <h1 class="text-2xl font-semibold mb-4 text-blue-700">Check the Weather</h1>
+    <input id="cityInput" type="text" placeholder="Enter city name" class="w-full p-2 border rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+    <button onclick="getWeather()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Get Weather</button>
+
+    <div id="weatherResult" class="mt-6 hidden">
+      <h2 class="text-xl font-bold mb-2" id="cityName"></h2>
+      <p id="description" class="text-gray-700"></p>
+      <p id="temperature" class="text-lg font-semibold"></p>
+      <p id="humidity" class="text-sm text-gray-600"></p>
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const apiKey = "YOUR_API_KEY"; // Replace with your real API key
+
+    async function getWeather() {
+      const city = document.getElementById("cityInput").value.trim();
+      if (!city) return alert("Please enter a city name");
+
+      const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error("City not found");
+
+        const data = await res.json();
+        document.getElementById("cityName").textContent = data.name;
+        document.getElementById("description").textContent = data.weather[0].description;
+        document.getElementById("temperature").textContent = `Temperature: ${data.main.temp}°C`;
+        document.getElementById("humidity").textContent = `Humidity: ${data.main.humidity}%`;
+
+        document.getElementById("weatherResult").classList.remove("hidden");
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Navbar scroll effect
+    window.addEventListener("scroll", () => {
+      const nav = document.getElementById("navbar");
+      if (window.scrollY > 10) {
+        nav.classList.add("bg-blue-600", "text-white");
+      } else {
+        nav.classList.remove("bg-blue-600", "text-white");
+      }
+    });
+  </script>
+
 </body>
 </html>
